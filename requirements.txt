@@ -1,11 +1,11 @@
-# Python 3.10+ (tested on 3.11, Windows)
+# Python 3.10+ (tested on 3.14, Windows)
 moderngl>=5.8,<6
 moderngl-window>=2.4
 PyOpenGL
 pyrr
-numpy<2
+numpy
 pywavefront
 pyqt5
 Pillow
-pygame        # sound (only needed if you add sound files to data/sounds/)
+pygame-ce     # sound (only needed if you add sound files to data/sounds/)
 av            # clips with sound: decodes the sound files once
