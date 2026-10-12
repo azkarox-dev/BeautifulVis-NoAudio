@@ -49,7 +49,8 @@ The vis listens on **UDP 127.0.0.1:9273** and renders whatever game states it re
   The optional per-car fields (`has_flip`, `ball_touched`, `controls`) make jumps, flips, flip resets and touches exact;
   without them they are guessed from the motion.
 
-Run several instances side by side with `RSV_PORT=<port>`.
+Run several instances side by side with `RSV_PORT=<port>`. The vis only draws while it has focus (drawing an
+unfocused OpenGL window crashed some drivers); `RSV_BACKGROUND=1` keeps it drawing, e.g. next to a console you type in.
 
 ## Controls
 

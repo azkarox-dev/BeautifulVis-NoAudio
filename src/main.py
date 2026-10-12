@@ -3592,6 +3592,9 @@ def main():
     # RSV_PORT lets a second instance (tests, a side-by-side comparison) run without stealing the
     # training vis's socket.
     port = int(os.environ.get("RSV_PORT", "9273"))
+    # RSV_BACKGROUND=1 keeps drawing while another window has focus (a console next to the vis); off by default
+    # because of the driver crash described in _drive_render.
+    background = os.environ.get("RSV_BACKGROUND") == "1"
 
     print("Starting RocketSimVis...")
 
@@ -3627,13 +3630,14 @@ def main():
         # Only repaint the GL widget while the window is the ACTIVE window. Repainting an OpenGL
         # context for a backgrounded window crashes on some drivers — that was the vis "closing" on
         # click-away. While unfocused the window simply holds its last frame (it does NOT close).
-        active = False
+        active = drawn = False
         try:
             active = window.isActiveWindow() and not window.isMinimized() and _is_foreground(window)
             # Suspend BEFORE repainting stops: Qt still repaints once on focus loss, which used to
             # restart the boost loop with no later frame to stop it.
             gl_widget.renderer.audio.set_active(active)
-            if active:
+            drawn = active or (background and not window.isMinimized())
+            if drawn:
                 window.gl_widget.update()
         except Exception:
             pass
@@ -3655,7 +3659,7 @@ def main():
             # "0" (pause the feed) only after 0.25 s unfocused in a row: while the window comes back to the front
             # Windows reports it as inactive for a few frames, and pausing the feed for each of those flickers
             # played the first moments after a tab-back in slow motion
-            held = active or now_ - _active_t[0] < 0.25
+            held = drawn or now_ - _active_t[0] < 0.25
             _focus_sock.sendto(b"1" if held else b"0", ("127.0.0.1", 9275))
         except Exception:
             pass
